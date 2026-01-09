@@ -1083,6 +1083,12 @@ function renderCategories() {
   categories.innerHTML += `<button class="cat-btn" onclick="showManualInput()">Manual Input</button>`;
 }
 
+
+function showCategories() {
+  renderCategories();
+}
+
+
 // Show items in menuGrid
 function showCategory(c) {
   categories.style.display = "none";      // hide categories
@@ -1127,6 +1133,7 @@ function addManualItem() {
 function showCategories() {
   renderCategories();
 }
+
 
 
 
