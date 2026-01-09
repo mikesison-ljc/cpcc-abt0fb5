@@ -460,18 +460,44 @@ body.history-open #historyContainer {
 
 const API_KEY = "CPCC_LJC_2026_PRIVATE_KEY";
 const TERMINAL_URL = "https://script.google.com/macros/s/AKfycbwrrWKnGULDg5LRQJwpC2pXD_FBmKsmXwDAl7ZdBy2vYbGfbB8HeJDToPuVNJ4ssTAIkw/exec";
-const TERMINAL_ID = "ABE_TRINOMA_POS01"; // your fixed terminal
-const FIXED_OUTLET = "ABE Trinoma";           // example outlet name
+
+const TERMINAL_ID = "ABE_TRINOMA_POS01";
+const FIXED_OUTLET = "ABE Trinoma";
+
+function showScreen(msg) {
+  document.body.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;
+                height:100vh;background:#111;color:white;
+                font-size:28px;text-align:center;">
+      ${msg}
+    </div>`;
+}
 
 async function checkTerminal() {
   try {
-    const url = `${TERMINAL_URL}?apiKey=${API_KEY}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const url = `${TERMINAL_URL}?apiKey=${encodeURIComponent(API_KEY)}`;
+    const res = await fetch(url, { method: "GET" });
 
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
+    }
+
+    const text = await res.text();
+
+    let payload;
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      throw new Error("INVALID_JSON");
+    }
+
+    if (!payload.ok) {
+      throw new Error(payload.error || "SERVER_ERROR");
+    }
+
+    const data = payload.terminals;
     const today = new Date();
 
-    // Find the matching terminal
     const row = data.find(r =>
       r.outlet === FIXED_OUTLET &&
       r.terminal === TERMINAL_ID &&
@@ -480,32 +506,25 @@ async function checkTerminal() {
     );
 
     if (!row) {
-      document.body.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;
-                    height:100vh;background:#111;color:white;
-                    font-size:28px;text-align:center;">
-          TERMINAL DISABLED<br><br>
-          Contact Head Office
-        </div>`;
+      showScreen(`TERMINAL DISABLED<br><br>Contact Head Office`);
       throw "TERMINAL_DISABLED";
     }
+
+    // ✅ terminal valid → app continues loading
+    console.log("Terminal OK");
+
   } catch (e) {
-    document.body.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;
-                  height:100vh;background:#111;color:white;
-                  font-size:28px;text-align:center;">
-        LICENSE SERVER UNREACHABLE
-      </div>`;
+    showScreen("LICENSE SERVER UNREACHABLE");
     console.error("Terminal check failed:", e);
     throw e;
   }
 }
 
-// =========================
-// 🚀 INIT
-// =========================
+/* ========================= */
+/* 🚀 INIT                   */
+/* ========================= */
 (async () => {
-  await checkTerminal(); // verify terminal is active first
+  await checkTerminal();
 })();
 
 
