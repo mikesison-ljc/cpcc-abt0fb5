@@ -511,6 +511,7 @@ function terminalCallback(payload) {
   s.src =
     TERMINAL_URL +
     "?apiKey=" + encodeURIComponent(API_KEY) +
+    "&action=checkTerminal" +
     "&callback=terminalCallback";
 
   s.onerror = () => showScreen("LICENSE SERVER UNREACHABLE");
@@ -824,8 +825,11 @@ async function pushToGoogleSheet(transaction){
     }
 
         
-    const url = "https://script.google.com/macros/s/AKfycbx_X4V7r0jkSfaW45ZQI9En7fkLJ2yE7iwcZQQcFUvAThTKco2DiKteyuD3vhFXnMG-/exec" +
-                "?data=" + API_KEY + encodeURIComponent(JSON.stringify(rows));
+    const url =
+      "https://script.google.com/macros/s/AKfycbx_X4V7r0jkSfaW45ZQI9En7fkLJ2yE7iwcZQQcFUvAThTKco2DiKteyuD3vhFXnMG-/exec" +
+      "?apiKey=" + encodeURIComponent(API_KEY) +
+      "&data=" + encodeURIComponent(JSON.stringify(rows));
+
 
     const res = await fetch(url);
     const text = await res.text();
@@ -1025,8 +1029,9 @@ async function startApp() {
     fetchCPCCUsers(),
     fetchMenu()
   ]);
+  renderCategories();   // 👈 important
 }
-</script>
+
 
 
 /* ===== INIT ===== */
