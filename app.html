@@ -652,38 +652,32 @@ async function updateCPCC() {
 }
 
 
-async function fetchCPCCUsers(){
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbxKg2pXdFuKY0h88V18etPv8cbcqnbKDPdNabGT8M1e0XcTL4BjoTuBf4jMRwMoPHxP-Q/exec?apiKey=" + API_KEY
-    );
-
-    const data = await res.json();
-
-    if (!data.users || !Array.isArray(data.users)) {
-      throw new Error("Invalid CPCC user payload");
-    }
-
-    CUSTOMER_LIMITS = {};
-    customerSelect.innerHTML =
-      `<option value="">Select Customer</option>`;
-
-    data.users.forEach(u => {
-      CUSTOMER_LIMITS[u.name] = Number(u.limit) || 0;
-
-      customerSelect.innerHTML +=
-        `<option value="${u.name}">${u.name}</option>`;
-    });
-
-    customerSelect.innerHTML +=
-      `<option value="Others">Others</option>`;
-
-  } catch(e){
-    console.error("CPCC USER LOAD ERROR:", e);
-    alert("Failed to Load CPCC users");
+function cpccUsersCallback(data) {
+  if (!data.users) {
+    alert("Invalid CPCC user payload");
+    return;
   }
+
+  CUSTOMER_LIMITS = {};
+  customerSelect.innerHTML = `<option value="">Select Customer</option>`;
+
+  data.users.forEach(u => {
+    CUSTOMER_LIMITS[u.name] = Number(u.limit) || 0;
+    customerSelect.innerHTML += `<option value="${u.name}">${u.name}</option>`;
+  });
+
+  customerSelect.innerHTML += `<option value="Others">Others</option>`;
 }
 
+function fetchCPCCUsers() {
+  const s = document.createElement("script");
+  s.src =
+    "https://script.google.com/macros/s/AKfycbwitth0q7KcGlyEvxHrAUWYU9HvbDC5P8fUnGazCGPbAuPbqFs8avDOijrtA0AFc-P96g/exec" +
+    "?apiKey=" + encodeURIComponent(API_KEY) +
+    "&callback=cpccUsersCallback";
+
+  document.head.appendChild(s);
+}
 
 
 
@@ -1040,7 +1034,7 @@ async function fetchHistory(){
       "<tr><td colspan='8'>No records found</td></tr>";
   }
 
-} catch (e) {
+  catch (e) {
   console.error(e);
   alert("Failed to fetch history");
 }
@@ -1051,17 +1045,26 @@ async function fetchHistory(){
 /* ===== INIT ===== */
 let MENU = {}; // will be populated dynamically from the Sheet
 
-// Fetch menu data from your Google Sheet API
-async function fetchMenu() {
+
+/* ===== MENU (JSONP) ===== */
+
+let MENU = {};   // category → [{ name, price }]
+let menuLoaded = false;
+
+function menuCallback(data) {
   try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbw42pVkbMnN86Od3jQ7DVu_G0moqdq-rsARxvfIqwANYUsCz-ZBQor2CoUbee1xiDJC7A/exec?apiKey=" + API_KEY);
-    const data = await res.json();
+    if (!Array.isArray(data)) {
+      throw new Error("Invalid menu payload");
+    }
 
     MENU = {}; // reset
+
     data.forEach(item => {
-      const cat = item.category;  // <- matches App Script
-      const name = item.name;     // <- matches App Script
-      const price = Number(item.price); // <- matches App Script
+      const cat   = item.category;
+      const name  = item.name;
+      const price = Number(item.price);
+
+      if (!cat || !name || isNaN(price)) return;
 
       if (!MENU[cat]) MENU[cat] = [];
       MENU[cat].push({ name, price });
@@ -1069,15 +1072,34 @@ async function fetchMenu() {
 
     // Sort each category alphabetically
     for (let c in MENU) {
-      MENU[c].sort((a,b)=> a.name.localeCompare(b.name));
+      MENU[c].sort((a, b) => a.name.localeCompare(b.name));
     }
 
-        
-  } catch(e) {
-    console.error(e);
-    alert("Failed to fetch Menu List");
+    menuLoaded = true;
+
+    // 🚀 render categories AFTER menu loads
+    renderCategories();
+
+  } catch (e) {
+    console.error("MENU LOAD ERROR:", e);
+    alert("Failed to load Menu List");
   }
 }
+
+
+
+function fetchMenu() {
+  const s = document.createElement("script");
+  s.src =
+    "https://script.google.com/macros/s/AKfycbyEnxA8lRKeEMvpPleicYTvBJXQy_ezuT1FyYXYcuH0K3f-_61FRp4zaHAkMJ8Yd7oueg/exec" +
+    "?apiKey=" + encodeURIComponent(API_KEY) +
+    "&callback=menuCallback";
+
+  s.onerror = () => alert("Menu server unreachable");
+  document.head.appendChild(s);
+}
+
+
 
 
 
@@ -1144,12 +1166,9 @@ function showCategories() {
   renderCategories();
 }
 
-async function startApp() {
-  await Promise.all([
-    fetchCPCCUsers(),
-    fetchMenu()
-  ]);
-  renderCategories();   // 👈 REQUIRED
+function startApp() {
+  fetchCPCCUsers(); // JSONP
+  fetchMenu();      // JSONP
 }
 
 
