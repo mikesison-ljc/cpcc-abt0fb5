@@ -672,7 +672,7 @@ function cpccUsersCallback(data) {
 function fetchCPCCUsers() {
   const s = document.createElement("script");
   s.src =
-    "https://script.google.com/macros/s/AKfycbwitth0q7KcGlyEvxHrAUWYU9HvbDC5P8fUnGazCGPbAuPbqFs8avDOijrtA0AFc-P96g/exec" +
+    "https://script.google.com/macros/s/AKfycbyvRXjrMnOmhVG06q60b0SjNbhahSgk8T1wvzeYg2QFb6JZ0XNqQyJGxMzzyk4BOcLtUg/exec" +
     "?apiKey=" + encodeURIComponent(API_KEY) +
     "&callback=cpccUsersCallback";
 
@@ -1042,10 +1042,6 @@ async function fetchHistory(){
 </script>
 
 <script>
-/* ===== INIT ===== */
-let MENU = {}; // will be populated dynamically from the Sheet
-
-
 /* ===== MENU (JSONP) ===== */
 
 let MENU = {};   // category → [{ name, price }]
