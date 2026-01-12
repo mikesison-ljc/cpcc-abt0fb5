@@ -8,7 +8,7 @@ if (!sessionStorage.getItem("cpcc_session")) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>LJC CPCC System v4.1.1</title>
+<title>LJC CPCC System v4.1.2</title>
 
 <!-- Inter Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -380,7 +380,7 @@ body.history-open #historyContainer {
 
     <!-- Filters -->
     <div style="display:flex; gap:8px; margin-bottom:10px;">
-      <input type="text" value="ABE Trinoma" disabled style="width:140px;">
+      <input type="text" value="BR Malate" disabled style="width:140px;">
       <input type="date" id="historyFrom">
       <input type="date" id="historyTo">
       <button onclick="fetchHistory()">Fetch</button>
@@ -435,7 +435,7 @@ body.history-open #historyContainer {
 
 
 <div id="topBar" class="cpcc-tabs">
-  <div id="outletBox">ABE Trinoma</div>
+  <div id="outletBox">BR Malate</div>
 
 
 <select id="customerSelect" onchange="handleCustomer()">
@@ -486,15 +486,15 @@ body.history-open #historyContainer {
 
   const _k = "CPCC_LJC_2026_PRIVATE_KEY";
 
-  const _t = "ABE_TRINOMA_POS01";
-  const _o = "ABE Trinoma";
-  window.OUTLET_NAME    = "ABE Trinoma";  // Friendly name for Google Sheet
+  const _t = "BR_MALATE_POS01";
+  const _o = "BR Malate";
+  window.OUTLET_NAME    = "BR Malate";  // Friendly name for Google Sheet
   window.FIXED_OUTLET   = window.OUTLET_NAME; // legacy reference
   window.HISTORY_OUTLET = window.OUTLET_NAME;
-  window.HISTORY_URL    = "https://script.google.com/macros/s/AKfycbx_X4V7r0jkSfaW45ZQI9En7fkLJ2yE7iwcZQQcFUvAThTKco2DiKteyuD3vhFXnMG-/exec";
+  window.HISTORY_URL    = "https://script.google.com/macros/s/AKfycbzqT5VRNzKoSH76gbQUOyRuqBPpHBEYLlAtkJPF6lgmLLpAy3ELxADSUT067reuMje66A/exec";
 
   const _u =
-    "https://script.google.com/macros/s/AKfycbzp0Bu7Ir-oD2a6ACenh4r3XyGJsbyQdynyr6sSYIovTf9olOooCu_DVUfaWyvSU40i/exec";
+    "https://script.google.com/macros/s/AKfycbxlZn5aPGcx5lIgg1-jnTCJgHUZrrynIw5fRMgPeRasZRn-rZeq5ZaLz47V54a8H4Fapg/exec";
 
   const _s = function (m) {
     document.body.innerHTML =
@@ -530,16 +530,7 @@ body.history-open #historyContainer {
     }
   };
 
-  const _l = document.createElement("script");
-  _l.src =
-    _u +
-    "?apiKey=" + encodeURIComponent(_k) +
-    "&action=checkTerminal" +
-    "&callback=_cb";
-
-  _l.onerror = () => _s("LICENSE SERVER UNREACHABLE");
-  document.head.appendChild(_l);
-
+  
   window.TERMINAL_URL = _u;
   window.API_KEY = _k;
   window.TERMINAL_ID = _t;
@@ -654,7 +645,26 @@ body.history-open #historyContainer {
 })();
 </script>
 
+<script>
+// ==========================
+// SESSION-PROTECTED CALLS
+// ==========================
 
+function validateTerminal() {
+  const s = document.createElement("script");
+  s.src =
+    TERMINAL_URL +
+    "?apiKey=" + encodeURIComponent(API_KEY) +
+    "&action=checkTerminal" +
+    "&terminal=" + encodeURIComponent(TERMINAL_ID) +
+    "&sessionToken=" + encodeURIComponent(window.SESSION_TOKEN) +
+    "&callback=_cb";
+
+  s.onerror = () => _s("LICENSE SERVER UNREACHABLE");
+  document.head.appendChild(s);
+}
+
+</script>
 
 <script>
 (function () {
@@ -877,7 +887,7 @@ body.history-open #historyContainer {
       }
 
       const url =
-        "https://script.google.com/macros/s/AKfycbx_X4V7r0jkSfaW45ZQI9En7fkLJ2yE7iwcZQQcFUvAThTKco2DiKteyuD3vhFXnMG-/exec" +
+        "https://script.google.com/macros/s/AKfycbzqT5VRNzKoSH76gbQUOyRuqBPpHBEYLlAtkJPF6lgmLLpAy3ELxADSUT067reuMje66A/exec" +
         "?apiKey=" + encodeURIComponent(API_KEY) +
         "&data=" + encodeURIComponent(JSON.stringify(rows));
   
@@ -1070,7 +1080,7 @@ window._uc = async function () {
 
   /* ===== HISTORY ===== */
   const _ho = window.OUTLET_NAME; // friendly outlet name for history
-  const _hu = "https://script.google.com/macros/s/AKfycbx_X4V7r0jkSfaW45ZQI9En7fkLJ2yE7iwcZQQcFUvAThTKco2DiKteyuD3vhFXnMG-/exec";
+  const _hu = "https://script.google.com/macros/s/AKfycbzqT5VRNzKoSH76gbQUOyRuqBPpHBEYLlAtkJPF6lgmLLpAy3ELxADSUT067reuMje66A/exec";
 
   window.openHistory = function(){
     document.body.classList.add("history-open");
@@ -1213,7 +1223,7 @@ window._uc = async function () {
   function fetchMenu() {
     const s = document.createElement("script");
     s.src =
-      "https://script.google.com/macros/s/AKfycbxhbiMwqgG6QRh-_o8Cp8u43bKNyBhmcHJemkjajboSF3Q_N7TmVMtaoHcN0RFOYnLJHg/exec" +
+      "https://script.google.com/macros/s/AKfycbxyR0YmS8bfrD4Y9pk5XvOc-0Z1J7t-MWAd4RGVZYHW09BYsnpgb6ZakgNSLqojegjv/exec" +
       "?apiKey=" + encodeURIComponent(API_KEY) +
       "&callback=_mcb";
 
